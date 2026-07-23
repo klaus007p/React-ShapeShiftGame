@@ -52,4 +52,59 @@ const Shapes = {
     },
 };
 
-const SHAPE_KEYS = ["circle", "square", "triangle","diamond", "pentagon", "hexagon", "star", "heart", "hexagram", "arrow"]
+const SHAPE_KEYS = ["circle", "square", "triangle","diamond", "pentagon", "hexagon", "star", "heart", "hexagram", "arrow"];
+
+function randomInt(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+const [player, setPlayerShape] = useState("circle")
+const [shapes, setShapes] = useState([]); //Falling Shapes
+const [score, setScore] = useState(0);
+const [lives, setLives] = useState(5); //
+const [running, setRunning] = useState(false);
+const spawnIntervalRef = useRef(null);
+const gameTicketRef = useRef(null)
+const areaRef = useRef(null)
+const controls = useAnimation();
+
+
+//Spawn Logic Start
+
+useEffect(() => {
+    function spawnShape() {
+        const shapeType = SHAPE_KEYS[randomInt(0, SHAPE_KEYS.length - 1)];
+        const left = randomInt(8 , 92); 
+        const speed = randomInt(2000, 5000); // ms to fall
+        const id = Math.random().toString(36).slice(2,9);
+        setShapes((s) => [
+            ...s,
+            {
+                id,
+                type: shapeType,
+                left,
+                top: -10,
+                createdAt: Date.now(),
+                speed,
+            },
+        ]);
+    }
+
+    if(running) {
+        const base = Math.max(700, 1500 - Math.floor(score / 5) * 50);
+        spawnIntervalRef.current = setInterval(spawnShape, base);
+
+        //spawn immediately
+        spawnShape();
+    }
+
+    return () => {
+        clearInterval(spawnIntervalRef.current);
+    };
+}, [running, score]);
+
+
+//Move Shapes Down!!
+
+
