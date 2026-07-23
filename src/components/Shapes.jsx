@@ -65,7 +65,7 @@ const [score, setScore] = useState(0);
 const [lives, setLives] = useState(5); //
 const [running, setRunning] = useState(false);
 const spawnIntervalRef = useRef(null);
-const gameTicketRef = useRef(null)
+const gameTickRef = useRef(null)
 const areaRef = useRef(null)
 const controls = useAnimation();
 
@@ -107,4 +107,52 @@ useEffect(() => {
 
 //Move Shapes Down!!
 
+useEffect(() => {
+    if(!running) return;
+    const tickMs = 40;
 
+    gameTickRef.current = setInterval(() => {
+        setShapes((prev) => {
+            const area = areaRef.current;
+            const areaHeight = area ? area.clientHeight : 600;
+            const playerY = areaHeight - 110;
+
+            const next = prev.map((sh) => {
+                const elapsed = Date.now() - sh.createdAt;
+                const progress = Math.min(1, elapsed / sh.speed);
+                const top = -10 + progress * (areaHeight + 20);
+                return{ ...sh, top};
+            }).filter((sh) => {
+                const leftPx = ((area ? area.clientWidth : 800) * sh.left) /100;
+                const topPx = (area ? area.clientHeight : 600) * (sh.top / area ? area.clientHeight : 600);
+                const dx = Math.abs(leftPx - (area ? area.clientWidth / 2 : 400));
+                const dy = Math.abs(topPx - playerY);
+                const hit = dx < 60 && dy < 60 && sh.top > areaHeight - 150;
+
+                if(hit){
+                    if(sh.type === playerShape){
+                        setScore((s) => s + 10);
+                        controls.start({scale: [1, 1.15, 1], transition: {duration: 0.35}});
+
+                    } else {
+                        setLives((l) => l - 1);
+                        controls.start({rotate: [0, -6, 6, 0], transition: {duration: 0.5}});
+
+                        if(navigator.vibrate) navigator.vibrate(80);
+                    }
+
+                    return null; //remove collided shape
+                }
+
+                if(sh.top > areaHeight + 50) return null;
+                return sh;
+            });
+            return next;
+        });
+    }, tickMs);
+
+    return () => clearInterval(gameTickRef.current);
+}, [running, playerShape, controls]);
+
+
+//Keyboard controls
