@@ -52,9 +52,9 @@ const Shapes = {
     },
 };
 
-const SHAPE_KEYS = ["circle", "square", "triangle","diamond", "pentagon", "hexagon", "star", "heart", "hexagram", "arrow"];
+const SHAPE_KEYS = ["circle", "square", "triangle", "diamond", "pentagon", "hexagon", "star", "heart", "hexagram", "arrow"];
 
-function randomInt(min, max){
+function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -75,9 +75,9 @@ const controls = useAnimation();
 useEffect(() => {
     function spawnShape() {
         const shapeType = SHAPE_KEYS[randomInt(0, SHAPE_KEYS.length - 1)];
-        const left = randomInt(8 , 92); 
+        const left = randomInt(8, 92);
         const speed = randomInt(2000, 5000); // ms to fall
-        const id = Math.random().toString(36).slice(2,9);
+        const id = Math.random().toString(36).slice(2, 9);
         setShapes((s) => [
             ...s,
             {
@@ -91,7 +91,7 @@ useEffect(() => {
         ]);
     }
 
-    if(running) {
+    if (running) {
         const base = Math.max(700, 1500 - Math.floor(score / 5) * 50);
         spawnIntervalRef.current = setInterval(spawnShape, base);
 
@@ -108,7 +108,7 @@ useEffect(() => {
 //Move Shapes Down!!
 
 useEffect(() => {
-    if(!running) return;
+    if (!running) return;
     const tickMs = 40;
 
     gameTickRef.current = setInterval(() => {
@@ -121,30 +121,30 @@ useEffect(() => {
                 const elapsed = Date.now() - sh.createdAt;
                 const progress = Math.min(1, elapsed / sh.speed);
                 const top = -10 + progress * (areaHeight + 20);
-                return{ ...sh, top};
+                return { ...sh, top };
             }).filter((sh) => {
-                const leftPx = ((area ? area.clientWidth : 800) * sh.left) /100;
+                const leftPx = ((area ? area.clientWidth : 800) * sh.left) / 100;
                 const topPx = (area ? area.clientHeight : 600) * (sh.top / area ? area.clientHeight : 600);
                 const dx = Math.abs(leftPx - (area ? area.clientWidth / 2 : 400));
                 const dy = Math.abs(topPx - playerY);
                 const hit = dx < 60 && dy < 60 && sh.top > areaHeight - 150;
 
-                if(hit){
-                    if(sh.type === playerShape){
+                if (hit) {
+                    if (sh.type === playerShape) {
                         setScore((s) => s + 10);
-                        controls.start({scale: [1, 1.15, 1], transition: {duration: 0.35}});
+                        controls.start({ scale: [1, 1.15, 1], transition: { duration: 0.35 } });
 
                     } else {
                         setLives((l) => l - 1);
-                        controls.start({rotate: [0, -6, 6, 0], transition: {duration: 0.5}});
+                        controls.start({ rotate: [0, -6, 6, 0], transition: { duration: 0.5 } });
 
-                        if(navigator.vibrate) navigator.vibrate(80);
+                        if (navigator.vibrate) navigator.vibrate(80);
                     }
 
                     return null; //remove collided shape
                 }
 
-                if(sh.top > areaHeight + 50) return null;
+                if (sh.top > areaHeight + 50) return null;
                 return sh;
             });
             return next;
@@ -156,3 +156,62 @@ useEffect(() => {
 
 
 //Keyboard controls
+
+useEffect(() => {
+    function onkey(e) {
+        if (e.key === "1") setPlayerShape("circle");
+        if (e.key === "2") setPlayerShape("square");
+        if (e.key === "3") setPlayerShape("triangle");
+        if (e.key === "4") setPlayerShape("diamond");
+        if (e.key === "5") setPlayerShape("pentagon");
+        if (e.key === "6") setPlayerShape("hexagon");
+        if (e.key === "7") setPlayerShape("star");
+        if (e.key === "8") setPlayerShape("heart");
+        if (e.key === "9") setPlayerShape("arrow");
+        if (e.key === " ") setRunning((r) => !r);
+
+    }
+
+    window.addEventListener("keydown", onkey);
+    return () => window.removeEventListener("keydown", onkey);
+
+}, []);
+
+
+// Game over watcher
+
+useEffect(() => {
+    if (lives <= 0) {
+        setRunning(false);
+    }
+}, [lives]);
+
+
+function resetGame() {
+    setScore(0);
+    setLives(3);
+    setShapes([]);
+    setPlayerShape("circle");
+    setRunning(true);
+}
+
+function shapeButton(shape) {
+    const active = playerShape === shape;
+
+    return (
+
+        <button
+            key={shape}
+            onClick={() => setPlayerShape(shape)}
+            className={`px-3 py-2 rounded-xl shadow-md transform-gpu hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 transition-all duration-150 ${active ? "bg-indigo-600 text-white shadow-lg" : "bg-white text-gray-800"
+                }`}
+        >
+            <div className="w-8 h-8">
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <path d={SHAPES[shape].path} fill={active ? "white" : "#4b5563"} />
+                </svg>
+            </div>
+        </button>
+
+    )
+}
