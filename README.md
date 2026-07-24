@@ -7,7 +7,6 @@ An interactive and animated **Shape Shifter game** built with **React** and **Fr
 - 🎨 Multiple unique shapes
 - 🔄 Smooth shape transformation animations
 - ⚡ Framer Motion powered animations
-- 🧩 SVG-based shapes
 - 🎮 Interactive gameplay
 - 📱 Responsive design
 - 🚀 Fast and modern React application
@@ -17,7 +16,6 @@ An interactive and animated **Shape Shifter game** built with **React** and **Fr
 - **React** – Frontend library
 - **Framer Motion** – Animations and transitions
 - **JavaScript** – Game logic
-- **SVG** – Shape rendering and morphing
 - **CSS / Tailwind CSS** – Styling
 
 ## 🎯 Shapes
@@ -31,12 +29,7 @@ The game includes several shapes that can be transformed into each other, such a
 - ⬟ Pentagon
 - ⬡ Hexagon
 - ⭐ Star
-- ❤️ Heart
-- 🛡️ Shield
-- ⚡ Lightning
-- ⚙️ Gear
-- 🛑 Octagon
-
+- 
 More shapes can be added as the project evolves!
 
 ## 🚀 Getting Started
@@ -45,3 +38,15 @@ More shapes can be added as the project evolves!
 
 ```bash
 git clone https://github.com/your-username/shape-shifter.git
+```
+## Folder Structure
+
+shape-shifter/
+├── public/
+├── src/
+│   ├── components/
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── package.json
+└── README.md
